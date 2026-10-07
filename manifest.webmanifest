@@ -1,0 +1,17 @@
+{
+  "name": "Numer'0",
+  "short_name": "Numer'0",
+  "description": "Practise writing numbers in Dutch, English, German and French, from 1 to 1000.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F7F5FF",
+  "theme_color": "#7C5CFF",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

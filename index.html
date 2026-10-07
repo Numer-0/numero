@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Numer'0</title>
+<meta name="description" content="Practise writing numbers in Dutch, English, German and French.">
+<meta name="theme-color" content="#7C5CFF">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+:root{
+  --bg:#F7F5FF; --card:#FFFFFF; --ink:#1E1B2E; --muted:#6E6A85; --line:#E4E0F2;
+  --brand:#7C5CFF; --brand-dk:#5B3EE0;
+  --ok:#2FCB6B; --ok-dk:#21A653; --ok-bg:#E3F9EB;
+  --bad:#FF4F5E; --bad-dk:#D93342; --bad-bg:#FFE8EA;
+  --gold:#FFC23D; --gold-dk:#E5A300;
+  --nl:#FF8A1F; --nl-dk:#DB6C00; --en:#1FA5F5; --en-dk:#0B84CC;
+  --de:#FFC23D; --de-dk:#DDA000; --fr:#FF5C8A; --fr-dk:#D93D6B;
+  --shadow:0 2px 0 var(--line);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#14121F; --card:#1F1C2E; --ink:#F3F1FF; --muted:#A39FBC; --line:#332F48;
+  --ok-bg:#163826; --bad-bg:#3D1A20;
+}}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;
+  -webkit-tap-highlight-color:transparent;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+.app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
+  padding:calc(16px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+.screen{flex:1;display:flex;flex-direction:column}
+
+/* chunky buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:15px 18px;border-radius:16px;
+  font-weight:900;font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:#fff;background:var(--c,var(--brand));
+  box-shadow:0 4px 0 var(--cd,var(--brand-dk));transition:transform .08s,box-shadow .08s}
+.btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--cd,var(--brand-dk))}
+.btn:disabled{background:var(--line);box-shadow:0 4px 0 var(--line);color:var(--muted);cursor:default}
+.btn.ghost{background:var(--card);color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.ok{--c:var(--ok);--cd:var(--ok-dk)} .btn.bad{--c:var(--bad);--cd:var(--bad-dk)}
+.icon-btn{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:active{background:var(--line)}
+
+/* home */
+.logo{font-size:52px;font-weight:900;letter-spacing:-.03em;text-align:center;margin:18px 0 0;line-height:1}
+.logo .o{display:inline-grid;place-items:center;width:.9em;height:.9em;border-radius:50%;background:var(--brand);color:#fff;
+  font-size:.62em;vertical-align:.08em;margin-left:2px;transform:rotate(-8deg)}
+.logo .ap{color:var(--gold)}
+.tag{text-align:center;color:var(--muted);font-weight:700;margin:10px 0 26px;font-size:17px}
+h2{font-size:22px;font-weight:900;margin:0 0 14px}
+.langs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lang{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px 12px 14px;box-shadow:0 4px 0 var(--line);
+  display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .08s,box-shadow .08s,border-color .15s}
+.lang:active{transform:translateY(4px);box-shadow:none}
+.lang:hover{border-color:var(--lc)}
+.flag{width:64px;height:44px;border-radius:10px;overflow:hidden;display:block;box-shadow:0 0 0 2px rgba(0,0,0,.06)}
+.lang b{font-size:18px}
+.lang small{color:var(--muted);font-weight:700;font-size:13px}
+.home-foot{margin-top:auto;padding-top:26px}
+
+/* game */
+.top{display:flex;align-items:center;gap:8px}
+.bar{flex:1;height:16px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;background:var(--lc);transition:width .4s;
+  background-image:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35));background-size:100% 5px;background-repeat:no-repeat;background-position:0 3px}
+.pts{display:flex;align-items:center;gap:5px;color:var(--gold-dk);font-size:18px;font-weight:900;min-width:64px;justify-content:flex-end}
+.stats{display:flex;justify-content:space-between;gap:8px;margin:14px 0 4px;color:var(--muted);font-size:13px;font-weight:800}
+.stats span b{color:var(--ink)}
+.mode{display:flex;justify-content:center;margin:14px 0 0}
+.seg{display:inline-flex;background:var(--line);border-radius:14px;padding:4px;gap:4px}
+.seg button{padding:8px 16px;border-radius:10px;font-weight:900;font-size:14px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--card);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.locked{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:14px;background:var(--line);color:var(--muted);font-size:14px;font-weight:800}
+.stage{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px 0}
+.prompt{color:var(--muted);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
+.prompt .flag{width:28px;height:19px;border-radius:5px}
+.num{font-size:clamp(88px,30vw,150px);font-weight:900;line-height:1;letter-spacing:-.04em;margin:8px 0 6px;color:var(--lc);
+  text-shadow:0 6px 0 var(--lcd)}
+.num.pop{animation:pop .35s ease-out}
+@keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+.cheer{height:26px;color:var(--ok-dk);font-weight:900;font-size:19px}
+.answer{width:100%;position:relative}
+.answer input{width:100%;font:inherit;font-size:22px;font-weight:800;color:var(--ink);background:var(--card);
+  border:2px solid var(--line);border-bottom-width:4px;border-radius:16px;padding:16px 50px 16px 16px;outline:none;transition:border-color .15s,background .15s}
+.answer input:focus{border-color:var(--brand)}
+.answer input.good{border-color:var(--ok);background:var(--ok-bg);color:var(--ok-dk)}
+.answer input.wrong{border-color:var(--bad);background:var(--bad-bg);color:var(--bad-dk)}
+.answer .mark{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:24px;color:var(--ok)}
+.answer.shake{animation:shake .35s}
+@keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.keys{display:flex;gap:8px;justify-content:center;margin-top:12px;min-height:44px}
+.keys button{min-width:46px;height:44px;border-radius:12px;background:var(--card);border:2px solid var(--line);box-shadow:0 3px 0 var(--line);font-size:19px;font-weight:800}
+.keys button:active{transform:translateY(3px);box-shadow:none}
+.float{position:fixed;font-weight:900;font-size:22px;color:var(--gold-dk);pointer-events:none;animation:up .9s ease-out forwards}
+@keyframes up{to{transform:translateY(-50px);opacity:0}}
+
+/* bottom sheet */
+.sheet-wrap{position:fixed;inset:0;background:rgba(20,18,31,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.sheet{width:100%;max-width:520px;background:var(--card);border-radius:24px 24px 0 0;padding:22px 16px calc(20px + env(safe-area-inset-bottom));
+  animation:slide .25s ease-out;max-height:92vh;overflow:auto}
+@keyframes slide{from{transform:translateY(100%)}}
+.sheet.bad{border-top:6px solid var(--bad)} .sheet.win{border-top:6px solid var(--gold)}
+.sheet h3{margin:0 0 4px;font-size:24px;font-weight:900}
+.sheet.bad h3{color:var(--bad-dk)}
+.sheet .lbl{color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin-top:14px}
+.sheet .correct{font-size:24px;font-weight:900;color:var(--ok-dk);word-break:break-word}
+.sheet .yours{font-size:18px;font-weight:700;color:var(--bad-dk);text-decoration:line-through;word-break:break-word}
+.sumrow{display:flex;gap:10px;margin:18px 0}
+.sum{flex:1;border:2px solid var(--line);border-radius:16px;padding:10px;text-align:center}
+.sum small{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.sum b{font-size:24px}
+.newbest{display:inline-block;background:var(--gold);color:#4A3500;padding:4px 10px;border-radius:99px;font-size:13px;margin-left:6px;vertical-align:middle}
+.stack{display:grid;gap:12px}
+
+/* scores */
+.hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.hdr h2{margin:0}
+.score-card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:14px;display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.score-card .flag{width:52px;height:36px;flex:none}
+.score-card .info{flex:1;min-width:0}
+.score-card .info small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.score-card .big{font-size:26px;font-weight:900;color:var(--gold-dk)}
+.history{margin-top:10px}
+.history h3{font-size:16px;color:var(--muted);margin:18px 0 8px;text-transform:uppercase;letter-spacing:.08em}
+.hrow{display:flex;justify-content:space-between;gap:10px;padding:10px 4px;border-bottom:2px solid var(--line);font-size:15px;font-weight:700}
+.hrow span:last-child{color:var(--muted);white-space:nowrap}
+.empty{color:var(--muted);font-weight:700;text-align:center;padding:16px}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+.tools p{grid-column:1/-1;margin:0;color:var(--muted);font-size:13px;font-weight:700;text-align:center}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HOME -->
+<section class="screen" id="home">
+  <h1 class="logo">Numer<span class="ap">'</span><span class="o">0</span></h1>
+  <p class="tag">Count to 1000. Spell every number. No mistakes. 😤</p>
+  <h2>Pick your language</h2>
+  <div class="langs" id="langs"></div>
+  <div class="home-foot">
+    <button class="btn" id="toScores">🏆 Highscores</button>
+  </div>
+</section>
+
+<!-- GAME -->
+<section class="screen" id="game" hidden>
+  <div class="top">
+    <button class="icon-btn" id="quit" aria-label="Back to menu">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+    <div class="pts" aria-label="Points"><span>⭐</span><span id="score">0</span></div>
+  </div>
+  <div class="stats">
+    <span>Session best <b id="sBest">0</b></span>
+    <span>All-time best <b id="aBest">0</b></span>
+  </div>
+  <div class="mode" id="modeBox"></div>
+  <div class="stage">
+    <div class="prompt"><span id="gFlag"></span><span id="gPrompt">Write this number in Dutch</span></div>
+    <div class="num" id="num">1</div>
+    <div class="cheer" id="cheer" aria-live="polite"></div>
+    <form class="answer" id="form" autocomplete="off">
+      <input id="inp" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false"
+        placeholder="Type it in words…" aria-label="Your answer">
+      <span class="mark" id="mark" hidden>✓</span>
+    </form>
+    <div class="keys" id="keys"></div>
+  </div>
+  <button class="btn ok" id="check" form="form" type="submit">Check</button>
+</section>
+
+<!-- SCORES -->
+<section class="screen" id="scores" hidden>
+  <div class="hdr">
+    <button class="icon-btn" id="scoresBack" aria-label="Back">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+    </button>
+    <h2>🏆 Highscores</h2>
+  </div>
+  <div id="scoreList"></div>
+  <div class="history">
+    <h3>Recent attempts</h3>
+    <div id="histList"></div>
+  </div>
+  <div class="tools">
+    <button class="btn ghost" id="backup">Back-up</button>
+    <button class="btn ghost" id="restoreBtn">Restore</button>
+    <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    <p>Scores live on this phone only. Make a back-up before you clear Chrome or switch phones.</p>
+  </div>
+</section>
+
+</div>
+
+<div class="sheet-wrap" id="sheetWrap" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+// ---------- flags ----------
+const FLAGS = {
+  nl:'<svg class="flag" viewBox="0 0 9 6"><rect width="9" height="2" fill="#AE1C28"/><rect y="2" width="9" height="2" fill="#fff"/><rect y="4" width="9" height="2" fill="#21468B"/></svg>',
+  de:'<svg class="flag" viewBox="0 0 5 3"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#DD0000"/><rect y="2" width="5" height="1" fill="#FFCE00"/></svg>',
+  fr:'<svg class="flag" viewBox="0 0 3 2"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>',
+  en:'<svg class="flag" viewBox="0 0 60 30"><clipPath id="u"><path d="M0 0v30h60V0z"/></clipPath><clipPath id="t"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath><g clip-path="url(#u)"><path d="M0 0v30h60V0z" fill="#012169"/><path d="M0 0l60 30m0-30L0 30" stroke="#fff" stroke-width="6"/><path d="M0 0l60 30m0-30L0 30" clip-path="url(#t)" stroke="#C8102E" stroke-width="4"/><path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/><path d="M30 0v30M0 15h60" stroke="#C8102E" stroke-width="6"/></g></svg>'
+};
+
+// ---------- number words ----------
+// Each function returns every accepted spelling; the first one is shown when you get it wrong.
+const EN = (() => {
+  const o = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+  const t = ['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+  const b = n => n < 20 ? o[n] : t[Math.floor(n/10)] + (n%10 ? '-' + o[n%10] : '');
+  return n => {
+    if (n === 1000) return ['one thousand','a thousand'];
+    if (n < 100) return [b(n)];
+    const h = Math.floor(n/100), r = n%100;
+    const heads = h === 1 ? ['one hundred','a hundred'] : [o[h] + ' hundred'];
+    return r ? heads.map(x => x + ' and ' + b(r)) : heads;
+  };
+})();
+
+const NL = (() => {
+  const u = ['','een','twee','drie','vier','vijf','zes','zeven','acht','negen','tien','elf','twaalf','dertien','veertien','vijftien','zestien','zeventien','achttien','negentien'];
+  const t = ['','','twintig','dertig','veertig','vijftig','zestig','zeventig','tachtig','negentig'];
+  const b = n => {
+    if (n < 20) return u[n];
+    const w = u[n%10], tens = t[Math.floor(n/10)];
+    if (!w) return tens;
+    return w + (w.endsWith('e') ? 'ën' : 'en') + tens; // tweeëntwintig, drieëndertig
+  };
+  return n => {
+    if (n === 1) return ['een','één'];
+    if (n === 1000) return ['duizend','eenduizend'];
+    if (n < 100) return [b(n)];
+    const h = Math.floor(n/100), r = n%100;
+    const heads = h === 1 ? ['honderd','eenhonderd'] : [u[h] + 'honderd'];
+    return heads.map(x => x + (r ? b(r) : ''));
+  };
+})();
+
+const DE = (() => {
+  const u = ['','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf','zwölf','dreizehn','vierzehn','fünfzehn','sechzehn','siebzehn','achtzehn','neunzehn'];
+  const t = ['','','zwanzig','dreißig','vierzig','fünfzig','sechzig','siebzig','achtzig','neunzig'];
+  const b = n => {
+    if (n < 20) return u[n];
+    const r = n%10, tens = t[Math.floor(n/10)];
+    return r ? (r === 1 ? 'ein' : u[r]) + 'und' + tens : tens; // einundzwanzig
+  };
+  return n => {
+    if (n === 1000) return ['tausend','eintausend'];
+    if (n < 100) return [b(n)];
+    const h = Math.floor(n/100), r = n%100;
+    const heads = h === 1 ? ['hundert','einhundert'] : [u[h] + 'hundert'];
+    if (!r) return heads;
+    return heads.flatMap(x => [x + b(r), x + 'und' + b(r)]); // hunderteins, hundertundeins
+  };
+})();
+
+// French: 1990 reformed spelling, hyphens between all number words.
+const FR = (() => {
+  const u = ['','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize','dix-sept','dix-huit','dix-neuf'];
+  const t = ['','','vingt','trente','quarante','cinquante','soixante'];
+  const b = n => {
+    if (n < 20) return u[n];
+    const d = Math.floor(n/10), r = n%10;
+    if (d === 7) return r === 1 ? 'soixante-et-onze' : 'soixante-' + u[10 + r];
+    if (d === 8) return r ? 'quatre-vingt-' + u[r] : 'quatre-vingts';
+    if (d === 9) return 'quatre-vingt-' + u[10 + r];
+    if (!r) return t[d];
+    return t[d] + (r === 1 ? '-et-un' : '-' + u[r]);
+  };
+  return n => {
+    if (n === 1000) return ['mille'];
+    if (n < 100) return [b(n)];
+    const h = Math.floor(n/100), r = n%100;
+    if (!r) return [h === 1 ? 'cent' : u[h] + '-cents'];
+    return [(h === 1 ? 'cent' : u[h] + '-cent') + '-' + b(r)];
+  };
+})();
+
+const LANGS = {
+  nl:{name:'Dutch', native:'Nederlands', words:NL, prompt:'Write this number in Dutch', keys:['ë','é']},
+  en:{name:'English', native:'UK', words:EN, prompt:'Write this number in English', keys:[]},
+  de:{name:'German', native:'Deutsch', words:DE, prompt:'Write this number in German', keys:['ü','ö','ß']},
+  fr:{name:'French', native:'Français', words:FR, prompt:'Write this number in French', keys:[]}
+};
+const ORDER = ['nl','en','de','fr'];
+
+// Case doesn't matter, a final full stop is optional; accents, dashes and spaces do matter.
+const norm = s => s.normalize('NFC').replace(/[‐‑]/g,'-').trim().replace(/\.+$/,'').trim().replace(/\s+/g,' ').toLowerCase();
+
+// ---------- storage ----------
+const KEY = 'numero.v1';
+function load(){ try { const d = JSON.parse(localStorage.getItem(KEY)); if (d && d.best) return d; } catch(e){} return {best:{}, attempts:[]}; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e){} }
+let data = load();
+const sessionBest = {};
+
+// ---------- helpers ----------
+const $ = id => document.getElementById(id);
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function show(id){ ['home','game','scores'].forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
+function setLangColor(l){ const r = document.documentElement.style; r.setProperty('--lc', `var(--${l})`); r.setProperty('--lcd', `var(--${l}-dk)`); }
+
+const YES = ['Nailed it!','Yesss!','Too easy 😎','Big brain 🧠','Clean!','Let\'s gooo!','On fire 🔥','Smooth.','Chef\'s kiss 🤌'];
+const NOPE = ['Oof. So close.','Plot twist!','Not quite…','Ouch!','Nope, but you got this.'];
+
+// ---------- home ----------
+$('langs').innerHTML = ORDER.map(l => {
+  const b = data.best[l];
+  return `<button class="lang" data-l="${l}" style="--lc:var(--${l})">${FLAGS[l]}<b>${LANGS[l].name}</b>
+    <small>${b ? '🏆 ' + b.score + ' pts' : 'No score yet'}</small></button>`;
+}).join('');
+function refreshHome(){
+  document.querySelectorAll('.lang').forEach(el => {
+    const b = data.best[el.dataset.l];
+    el.querySelector('small').textContent = b ? '🏆 ' + b.score + ' pts' : 'No score yet';
+  });
+}
+$('langs').addEventListener('click', e => { const el = e.target.closest('.lang'); if (el) startGame(el.dataset.l); });
+$('toScores').onclick = () => { renderScores(); show('scores'); };
+$('scoresBack').onclick = () => { refreshHome(); show('home'); };
+
+// ---------- game ----------
+const g = {lang:'nl', last:0, cur:1, score:0, tens:false, busy:false};
+
+function startGame(l){
+  g.lang = l; setLangColor(l);
+  $('gFlag').innerHTML = FLAGS[l];
+  $('gPrompt').textContent = LANGS[l].prompt;
+  $('keys').innerHTML = LANGS[l].keys.map(k => `<button type="button" data-k="${k}" aria-label="Insert ${k}">${k}</button>`).join('');
+  show('game');
+  reset();
+}
+function reset(){
+  g.last = 0; g.score = 0; g.tens = false; g.busy = false;
+  next();
+}
+function next(){
+  g.cur = g.tens ? Math.floor(g.last/10)*10 + 10 : g.last + 1;
+  const n = $('num'); n.textContent = g.cur; n.classList.remove('pop'); void n.offsetWidth; n.classList.add('pop');
+  const inp = $('inp'); inp.value = ''; inp.className = ''; inp.disabled = false;
+  $('mark').hidden = true; $('cheer').textContent = ''; $('check').disabled = false;
+  updateHud();
+  inp.focus();
+}
+function updateHud(){
+  $('score').textContent = g.score;
+  $('barFill').style.width = (g.last/10) + '%';
+  $('sBest').textContent = Math.max(sessionBest[g.lang] || 0, g.score);
+  $('aBest').textContent = Math.max((data.best[g.lang] || {}).score || 0, g.score);
+  const box = $('modeBox');
+  if (g.last < 20) box.innerHTML = `<span class="locked">🔒 Tens mode unlocks at 20</span>`;
+  else box.innerHTML = `<div class="seg" role="group" aria-label="Step size">
+      <button type="button" data-m="1" aria-pressed="${!g.tens}">+1 · 10 pts</button>
+      <button type="button" data-m="10" aria-pressed="${g.tens}">+10 · 5 pts</button></div>`;
+}
+$('modeBox').addEventListener('click', e => {
+  const b = e.target.closest('[data-m]'); if (!b || g.busy) return;
+  const tens = b.dataset.m === '10'; if (tens === g.tens) return;
+  g.tens = tens; next();
+});
+$('keys').addEventListener('pointerdown', e => {
+  const b = e.target.closest('[data-k]'); if (!b) return;
+  e.preventDefault(); // keep the phone keyboard open
+  const inp = $('inp'); if (inp.disabled) return;
+  const s = inp.selectionStart ?? inp.value.length, en = inp.selectionEnd ?? s;
+  inp.setRangeText(b.dataset.k, s, en, 'end'); inp.focus();
+});
+
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  if (g.busy) return;
+  const inp = $('inp'), raw = inp.value;
+  if (!raw.trim()) { inp.focus(); return; }
+  const accepted = LANGS[g.lang].words(g.cur);
+  g.busy = true; $('check').disabled = true;
+  if (accepted.map(norm).includes(norm(raw))) {
+    const pts = g.tens ? 5 : 10;
+    g.score += pts; g.last = g.cur;
+    inp.className = 'good'; inp.disabled = true; $('mark').hidden = false;
+    $('cheer').textContent = pick(YES);
+    floatPts('+' + pts);
+    if (g.last === 20) $('cheer').textContent = '🔓 Tens mode unlocked!';
+    updateHud();
+    if (g.cur >= 1000) { setTimeout(win, 700); return; }
+    setTimeout(() => { g.busy = false; next(); }, g.last === 20 ? 1300 : 750);
+  } else {
+    inp.className = 'wrong'; inp.disabled = true;
+    const a = $('form'); a.classList.remove('shake'); void a.offsetWidth; a.classList.add('shake');
+    setTimeout(() => fail(raw, accepted[0]), 450);
+  }
+});
+function floatPts(txt){
+  const r = $('score').getBoundingClientRect(), f = document.createElement('div');
+  f.className = 'float'; f.textContent = txt; f.style.left = (r.left - 6) + 'px'; f.style.top = (r.bottom + 4) + 'px';
+  document.body.appendChild(f); setTimeout(() => f.remove(), 900);
+}
+
+function record(){
+  const l = g.lang, s = g.score;
+  const isSession = s > (sessionBest[l] || 0), isBest = s > ((data.best[l] || {}).score || 0);
+  if (isSession) sessionBest[l] = s;
+  if (s > 0 || g.last > 0) {
+    const now = new Date().toISOString();
+    data.attempts.unshift({lang:l, score:s, reached:g.last, date:now});
+    data.attempts = data.attempts.slice(0, 200);
+    if (isBest) data.best[l] = {score:s, reached:g.last, date:now};
+    save();
+  }
+  return {isBest: isBest && s > 0};
+}
+function summary(best){
+  return `<div class="sumrow">
+    <div class="sum"><small>Score</small><b>${g.score}</b>${best ? '<br><span class="newbest">NEW BEST!</span>' : ''}</div>
+    <div class="sum"><small>Reached</small><b>${g.last}</b></div>
+    <div class="sum"><small>All-time</small><b>${data.best[g.lang]?.score || 0}</b></div></div>`;
+}
+function fail(raw, correct){
+  const {isBest} = record();
+  openSheet('bad', `<h3>${pick(NOPE)}</h3>
+    <div class="lbl">${g.cur} is spelled</div><div class="correct">${esc(correct)}</div>
+    <div class="lbl">You wrote</div><div class="yours">${esc(raw)}</div>
+    ${summary(isBest)}
+    <div class="stack"><button class="btn" id="again">↻ Start over at 1</button>
+    <button class="btn ghost" id="menu">Menu</button></div>`);
+}
+function win(){
+  const {isBest} = record();
+  openSheet('win', `<h3>🎉 1000! LEGEND.</h3><p style="color:var(--muted);font-weight:700;margin:6px 0 0">
+    You spelled your way all the way up in ${LANGS[g.lang].name}. Absolutely unreal.</p>
+    ${summary(isBest)}
+    <div class="stack"><button class="btn" id="again">↻ Play again</button><button class="btn ghost" id="menu">Menu</button></div>`);
+}
+function openSheet(kind, html){
+  $('sheet').className = 'sheet ' + kind; $('sheet').innerHTML = html; $('sheetWrap').hidden = false;
+  $('again').onclick = () => { $('sheetWrap').hidden = true; reset(); };
+  $('menu').onclick = () => { $('sheetWrap').hidden = true; refreshHome(); show('home'); };
+  $('again').focus();
+}
+$('quit').onclick = () => {
+  if (g.busy && !$('sheetWrap').hidden) return;
+  if (g.last > 0 && !confirm('Quit this run? Your score so far will be saved.')) return;
+  if (g.last > 0) record();
+  refreshHome(); show('home');
+};
+
+// ---------- scores ----------
+function renderScores(){
+  $('scoreList').innerHTML = ORDER.map(l => {
+    const b = data.best[l];
+    return `<div class="score-card">${FLAGS[l]}<div class="info"><b>${LANGS[l].name}</b>
+      <small>${b ? `Reached ${b.reached} · ${fmtDate(b.date)}` : 'Not played yet'}</small></div>
+      <div class="big">${b ? b.score : '–'}</div></div>`;
+  }).join('');
+  const h = data.attempts.slice(0, 15);
+  $('histList').innerHTML = h.length ? h.map(a =>
+    `<div class="hrow"><span>${LANGS[a.lang].name} · ${a.score} pts · to ${a.reached}</span><span>${fmtDate(a.date)}</span></div>`).join('')
+    : '<div class="empty">No attempts yet. Go get that first score!</div>';
+}
+$('backup').onclick = () => {
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `numer0-backup-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+$('restoreBtn').onclick = () => $('restoreFile').click();
+$('restoreFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d || typeof d.best !== 'object' || !Array.isArray(d.attempts)) throw 0;
+    if (!confirm('Replace your current scores with this back-up?')) return;
+    data = d; save(); renderScores(); refreshHome();
+  } catch(err) { alert('That file is not a Numer\'0 back-up.'); }
+  e.target.value = '';
+};
+
+if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
