@@ -55,6 +55,13 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .logo .ap{color:var(--gold)}
 .tag{text-align:center;color:var(--muted);font-weight:700;margin:10px 0 26px;font-size:17px}
 h2{font-size:22px;font-weight:900;margin:0 0 14px}
+.playmode{display:flex;flex-direction:column;align-items:center;gap:10px;margin:0 0 20px}
+.playmode .seg{display:flex;width:100%}
+.playmode .seg button{flex:1;padding:11px 8px;font-size:15px}
+.startat{display:flex;align-items:center;gap:10px;color:var(--muted);font-weight:800;font-size:15px}
+.startat input{width:96px;font:inherit;font-size:22px;font-weight:900;text-align:center;color:var(--ink);background:var(--card);
+  border:2px solid var(--line);border-bottom-width:4px;border-radius:14px;padding:8px;outline:none}
+.startat input:focus{border-color:var(--brand)}
 .langs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .lang{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px 12px 14px;box-shadow:0 4px 0 var(--line);
   display:flex;flex-direction:column;align-items:center;gap:10px;transition:transform .08s,box-shadow .08s,border-color .15s}
@@ -146,6 +153,15 @@ h2{font-size:22px;font-weight:900;margin:0 0 14px}
 <section class="screen" id="home">
   <h1 class="logo">Numer<span class="ap">'</span><span class="o">0</span></h1>
   <p class="tag">Count to 1000. Spell every number. No mistakes. 😤</p>
+  <div class="playmode">
+    <div class="seg" role="group" aria-label="Play mode">
+      <button type="button" data-pm="classic" aria-pressed="true">Classic · from 1</button>
+      <button type="button" data-pm="jump" aria-pressed="false">🚀 Jump in</button>
+    </div>
+    <label class="startat" id="startBox" hidden>Start at
+      <input id="startNum" type="number" inputmode="numeric" min="1" max="1000" value="100">
+    </label>
+  </div>
   <h2>Pick your language</h2>
   <div class="langs" id="langs"></div>
   <div class="home-foot">
@@ -330,12 +346,30 @@ function refreshHome(){
     el.querySelector('small').textContent = b ? '🏆 ' + b.score + ' pts' : 'No score yet';
   });
 }
-$('langs').addEventListener('click', e => { const el = e.target.closest('.lang'); if (el) startGame(el.dataset.l); });
+// Play mode: Classic always starts at 1, Jump in starts at a number you pick. Remembered on this phone.
+const prefs = Object.assign({mode:'classic', start:100}, data.prefs);
+const clampStart = v => Math.min(1000, Math.max(1, Math.round(Number(v)) || 1));
+function setPlayMode(m){
+  prefs.mode = m;
+  document.querySelectorAll('[data-pm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.pm === m));
+  $('startBox').hidden = m !== 'jump';
+  data.prefs = prefs; save();
+}
+$('startNum').value = prefs.start;
+setPlayMode(prefs.mode);
+document.querySelector('.playmode .seg').addEventListener('click', e => { const b = e.target.closest('[data-pm]'); if (b) setPlayMode(b.dataset.pm); });
+$('startNum').addEventListener('change', () => { prefs.start = clampStart($('startNum').value); $('startNum').value = prefs.start; data.prefs = prefs; save(); });
+$('langs').addEventListener('click', e => {
+  const el = e.target.closest('.lang'); if (!el) return;
+  prefs.start = clampStart($('startNum').value); $('startNum').value = prefs.start;
+  g.start = prefs.mode === 'jump' ? prefs.start : 1;
+  startGame(el.dataset.l);
+});
 $('toScores').onclick = () => { renderScores(); show('scores'); };
 $('scoresBack').onclick = () => { refreshHome(); show('home'); };
 
 // ---------- game ----------
-const g = {lang:'nl', last:0, cur:1, score:0, tens:false, busy:false};
+const g = {lang:'nl', start:1, last:0, cur:1, score:0, tens:false, busy:false};
 
 function startGame(l){
   g.lang = l; setLangColor(l);
@@ -346,7 +380,7 @@ function startGame(l){
   reset();
 }
 function reset(){
-  g.last = 0; g.score = 0; g.tens = false; g.busy = false;
+  g.last = g.start - 1; g.score = 0; g.tens = false; g.busy = false;
   next();
 }
 function next(){
@@ -414,11 +448,11 @@ function record(){
   const l = g.lang, s = g.score;
   const isSession = s > (sessionBest[l] || 0), isBest = s > ((data.best[l] || {}).score || 0);
   if (isSession) sessionBest[l] = s;
-  if (s > 0 || g.last > 0) {
+  if (s > 0) {
     const now = new Date().toISOString();
-    data.attempts.unshift({lang:l, score:s, reached:g.last, date:now});
+    data.attempts.unshift({lang:l, score:s, start:g.start, reached:g.last, date:now});
     data.attempts = data.attempts.slice(0, 200);
-    if (isBest) data.best[l] = {score:s, reached:g.last, date:now};
+    if (isBest) data.best[l] = {score:s, start:g.start, reached:g.last, date:now};
     save();
   }
   return {isBest: isBest && s > 0};
@@ -435,7 +469,7 @@ function fail(raw, correct){
     <div class="lbl">${g.cur} is spelled</div><div class="correct">${esc(correct)}</div>
     <div class="lbl">You wrote</div><div class="yours">${esc(raw)}</div>
     ${summary(isBest)}
-    <div class="stack"><button class="btn" id="again">↻ Start over at 1</button>
+    <div class="stack"><button class="btn" id="again">↻ Start over at ${g.start}</button>
     <button class="btn ghost" id="menu">Menu</button></div>`);
 }
 function win(){
@@ -453,8 +487,8 @@ function openSheet(kind, html){
 }
 $('quit').onclick = () => {
   if (g.busy && !$('sheetWrap').hidden) return;
-  if (g.last > 0 && !confirm('Quit this run? Your score so far will be saved.')) return;
-  if (g.last > 0) record();
+  if (g.score > 0 && !confirm('Quit this run? Your score so far will be saved.')) return;
+  if (g.score > 0) record();
   refreshHome(); show('home');
 };
 
@@ -463,12 +497,12 @@ function renderScores(){
   $('scoreList').innerHTML = ORDER.map(l => {
     const b = data.best[l];
     return `<div class="score-card">${FLAGS[l]}<div class="info"><b>${LANGS[l].name}</b>
-      <small>${b ? `Reached ${b.reached} · ${fmtDate(b.date)}` : 'Not played yet'}</small></div>
+      <small>${b ? `${b.start > 1 ? b.start + '→' : 'Reached '}${b.reached} · ${fmtDate(b.date)}` : 'Not played yet'}</small></div>
       <div class="big">${b ? b.score : '–'}</div></div>`;
   }).join('');
   const h = data.attempts.slice(0, 15);
   $('histList').innerHTML = h.length ? h.map(a =>
-    `<div class="hrow"><span>${LANGS[a.lang].name} · ${a.score} pts · to ${a.reached}</span><span>${fmtDate(a.date)}</span></div>`).join('')
+    `<div class="hrow"><span>${LANGS[a.lang].name} · ${a.score} pts · ${a.start > 1 ? a.start + '→' : 'to '}${a.reached}</span><span>${fmtDate(a.date)}</span></div>`).join('')
     : '<div class="empty">No attempts yet. Go get that first score!</div>';
 }
 $('backup').onclick = () => {
