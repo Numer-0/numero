@@ -1,10 +1,11 @@
 // Offline support: keeps the app working without a connection.
 // Bump VERSION whenever index.html changes so phones pick up the update.
-const VERSION = 'numer0-1.2.1';
+const VERSION = 'numer0-1.2.2';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache:'reload' skips the browser's HTTP cache, so a new version never stores stale files.
+  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL.map(u => new Request(u, {cache: 'reload'})))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
@@ -20,12 +21,13 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
 
-  // The page itself: try the network first (to get updates), fall back to the saved copy offline.
-  if (req.mode === 'navigate') {
+  // The page and the manifest: try the network first (to get updates), fall back to the saved copy offline.
+  if (req.mode === 'navigate' || url.pathname.endsWith('.webmanifest')) {
+    const key = req.mode === 'navigate' ? './index.html' : './manifest.webmanifest';
     e.respondWith(
-      fetch(req)
-        .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put('./index.html', copy)); return res; })
-        .catch(() => caches.match('./index.html'))
+      fetch(req, {cache: 'no-cache'})
+        .then(res => { const copy = res.clone(); caches.open(VERSION).then(c => c.put(key, copy)); return res; })
+        .catch(() => caches.match(key))
     );
     return;
   }
