@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght,ROND@100..900,0..100&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -30,7 +30,7 @@
   --ok-bg:#163826; --bad-bg:#3D1A20;
 }}
 html,body{margin:0;height:100%}
-body{background:var(--bg);color:var(--ink);font-family:Nunito,system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;
+body{background:var(--bg);color:var(--ink);font-family:"Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif;font-weight:800;
   -webkit-tap-highlight-color:transparent;overflow-x:hidden}
 button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;
@@ -49,7 +49,7 @@ button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
 .icon-btn:active{background:var(--line)}
 
 /* home */
-.logo{font-size:52px;font-weight:900;letter-spacing:-.03em;text-align:center;margin:18px 0 0;line-height:1}
+.logo{font-size:56px;font-weight:900;letter-spacing:-.02em;text-align:center;margin:18px 0 0;line-height:1}
 .logo .o{display:inline-grid;place-items:center;width:.9em;height:.9em;border-radius:50%;background:var(--brand);color:#fff;
   font-size:.62em;vertical-align:.08em;margin-left:2px;transform:rotate(-8deg)}
 .logo .ap{color:var(--gold)}
@@ -88,10 +88,14 @@ h2{font-size:22px;font-weight:900;margin:0 0 14px}
 .stage{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:12px 0}
 .prompt{color:var(--muted);font-weight:800;font-size:15px;display:flex;align-items:center;gap:8px}
 .prompt .flag{width:28px;height:19px;border-radius:5px}
-.num{font-size:clamp(88px,30vw,150px);font-weight:900;line-height:1;letter-spacing:-.04em;margin:8px 0 6px;color:var(--lc);
-  text-shadow:0 6px 0 var(--lcd)}
+.num{font-size:clamp(110px,38vw,180px);font-weight:900;line-height:1;letter-spacing:0;margin:8px 0 6px;color:var(--lc);
+  }
 .num.pop{animation:pop .35s ease-out}
 @keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
+/* Doto: dot-matrix digits for everything that is a number */
+.logo .o,.num,.sum b,.score-card .big{font-family:Doto,"Plus Jakarta Sans",monospace;font-weight:900;font-variation-settings:"ROND" 100}
+.num{color:var(--lcd)}
+@media (prefers-color-scheme:dark){.num{color:var(--lc)}}
 .cheer{height:26px;color:var(--ok-dk);font-weight:900;font-size:19px}
 .answer{width:100%;position:relative}
 .answer input{width:100%;font:inherit;font-size:22px;font-weight:800;color:var(--ink);background:var(--card);
