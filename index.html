@@ -338,7 +338,11 @@ const $ = id => document.getElementById(id);
 const pick = a => a[Math.floor(Math.random()*a.length)];
 const fmtDate = iso => new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function show(id){ ['home','game','scores'].forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
+let updateReady = false; // a new app version is waiting; load it once we're back on the main screen
+function show(id){
+  if (id === 'home' && updateReady) { location.reload(); return; }
+  ['home','game','scores'].forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0);
+}
 function setLangColor(l){ const r = document.documentElement.style; r.setProperty('--lc', `var(--${l})`); r.setProperty('--lcd', `var(--${l}-dk)`); }
 
 const NOPE = ['Oof. So close.','Plot twist!','Not quite…','Ouch!','Nope, but you got this.'];
@@ -532,7 +536,19 @@ $('restoreFile').onchange = async e => {
   e.target.value = '';
 };
 
-if ('serviceWorker' in navigator && location.protocol !== 'file:') navigator.serviceWorker.register('sw.js');
+// Updates: Android often resumes the app instead of reopening it, so look for a new version
+// every time the app comes back on screen, and switch to it without interrupting a run.
+if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  let hadWorker = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update(); });
+  });
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadWorker) { hadWorker = true; return; } // very first install: nothing to refresh
+    if (!$('game').hidden && g.score > 0) updateReady = true; // mid-run: wait until back on the main screen
+    else location.reload();
+  });
+}
 </script>
 </body>
 </html>
