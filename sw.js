@@ -1,6 +1,6 @@
 // Offline support: keeps the app working without a connection.
 // Bump VERSION whenever index.html changes so phones pick up the update.
-const VERSION = 'numer0-1.2.2';
+const VERSION = 'numer0-1.3.0';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/maskable-512.png'];
 
 self.addEventListener('install', e => {

@@ -315,6 +315,12 @@ const LANGS = {
   de:{name:'German', native:'Deutsch', words:DE, prompt:'Write this number in German', keys:['ü','ö','ß']},
   fr:{name:'French', native:'Français', words:FR, prompt:'Write this number in French', keys:[]}
 };
+// Cheers after a correct answer, in the language you're practising.
+// French puts a (narrow, non-breaking) space before ! — that's  .
+LANGS.nl.cheers = ['Top!','Goed zo!','Lekker bezig!','Knap!','Geweldig!','Super!','Toppie!','Perfect!','Heel goed! 🔥','Wauw! 🤩'];
+LANGS.en.cheers = ['Brilliant!','Spot on!','Nailed it!','Cracking!','Smashing it!','Top stuff!','Ace!','Well done! 🔥','Big brain 🧠'];
+LANGS.de.cheers = ['Sehr gut!','Klasse!','Spitze!','Super!','Wahnsinn!','Perfekt!','Stark!','Toll gemacht!','Mega! 🔥','Genau! 🤩'];
+LANGS.fr.cheers = ['Incroyable !','Fantastique !','Bravo !','Génial !','Parfait !','Super !','Excellent !','Trop fort ! 🔥','Impeccable !','Chapeau ! 🎩'];
 const ORDER = ['nl','en','de','fr'];
 
 // Case doesn't matter, a final full stop is optional; accents, dashes and spaces do matter.
@@ -335,7 +341,6 @@ const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','
 function show(id){ ['home','game','scores'].forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
 function setLangColor(l){ const r = document.documentElement.style; r.setProperty('--lc', `var(--${l})`); r.setProperty('--lcd', `var(--${l}-dk)`); }
 
-const YES = ['Nailed it!','Yesss!','Too easy 😎','Big brain 🧠','Clean!','Let\'s gooo!','On fire 🔥','Smooth.','Chef\'s kiss 🤌'];
 const NOPE = ['Oof. So close.','Plot twist!','Not quite…','Ouch!','Nope, but you got this.'];
 
 // ---------- home ----------
@@ -430,7 +435,7 @@ $('form').addEventListener('submit', e => {
     const pts = g.tens ? 5 : 10;
     g.score += pts; g.last = g.cur;
     inp.className = 'good'; inp.disabled = true; $('mark').hidden = false;
-    $('cheer').textContent = pick(YES);
+    $('cheer').textContent = pick(LANGS[g.lang].cheers);
     floatPts('+' + pts);
     if (g.last === 20) $('cheer').textContent = '🔓 Tens mode unlocked!';
     updateHud();
